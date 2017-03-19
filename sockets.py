@@ -74,16 +74,16 @@ class World:
 
 myWorld = World()        
 
+# Copied from https://github.com/abramhindle/WebSocketsExamples/blob/master/broadcaster.py#L111 written by Abram Hindle
+clients = list()
 
 def set_listener( entity, data ):
     ''' do something with the update ! '''
-    myWorld.set(entity, data)
+    updated = json.dumps({entity: data})
+    for client in clients:
+        client.put(updated)
 
 myWorld.add_set_listener( set_listener )
-
-
-# Copied from https://github.com/abramhindle/WebSocketsExamples/blob/master/broadcaster.py#L111 written by Abram Hindle
-clients = list()
 
 
 # Copied from https://github.com/abramhindle/WebSocketsExamples/blob/master/broadcaster.py#L115 written by Abram Hindle
@@ -103,17 +103,17 @@ def hello():
     return flask.redirect(flask.url_for('static', filename='index.html'))
 
 
-def read_ws(ws,client):
+def read_ws(ws, client):
     '''A greenlet function that reads from the websocket and updates the world'''
     # XXX: TODO IMPLEMENT ME
     try:
         while True:
             data = ws.receive()
-            if len(data) != 0:
+            if data is not None:
                 packet = json.loads(data)
                 myWorld.set(packet.get('entity'), packet.get('data'))
-                send_all_json(packet)
-                client.put(packet)
+                #send_all_json(packet)
+                #client.put(packet)
             else:
                 break
     except Exception as e:
@@ -125,13 +125,13 @@ def subscribe_socket(ws):
     '''Fufill the websocket URL of /subscribe, every update notify the
        websocket and read updates from the websocket '''
     # XXX: TODO IMPLEMENT ME
+    print "subscribing"
     client = Client()
     clients.append(client)
-    g = gevent.spawn(read_ws, ws, client)
-    print "subscribing"
+    event = gevent.spawn(read_ws, ws, client)
 
-    for key in myWorld.world().keys():
-        client.put(json.dumps({'entity': key, 'data': myWorld.world()[key]}))
+    #for key in myWorld.world().keys():
+        #client.put(json.dumps({'entity': key, 'data': myWorld.world()[key]}))
 
     try:
         while True:
@@ -141,13 +141,13 @@ def subscribe_socket(ws):
         print "WS Error %s" % e
     finally:
         clients.remove(client)
-        gevent.kill(g)
+        gevent.kill(event)
 
 
 def flask_post_json():
     '''Ah the joys of frameworks! They do so much work for you
        that they get in the way of sane operation!'''
-    if (request.json != None):
+    if request.json is not None:
         return request.json
     elif (request.data != None and request.data != ''):
         return json.loads(request.data)
