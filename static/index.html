@@ -70,6 +70,7 @@ function prepEntity(entity) {
 }
 
 function clearFrame() {
+    // Copied from previous ajax assignment
     var dark_image =  new Image();
     dark_image.src = "http://hd-wall-papers.com/images/wallpapers/dark-background-images/dark-background-images-16.jpg";
     var pattern =  context.createPattern(dark_image, "repeat")
@@ -132,6 +133,11 @@ function addEntity(entity, data) {
     world[entity] = data;
     drawNextFrame(); // (but should we?)
     //XXX: Send a XHTML Request that updates the entity you just modified!
+    var dict = {};
+    dict[entity] = data;
+    var dataToSend = JSON.stringify(dict);
+    socket.send(dataToSend);
+    drawNextFrame();
 }
 var counter = 0;
 function addEntityWithoutName(data) {
@@ -261,6 +267,12 @@ function wsSetup() {
     socket = new WebSocket(url);
     socket.onopen = function() {
         //XXX: TODO What are you going to do here?
+        sendJSONXMLHTTPRequest('/world', null, function(received){
+            if (world !== received){
+                world = received;
+                drawNextFrame();
+            }
+        });
     };
     socket.onerror = function(msg) {
         debug("WebSocket Error:" + msg.data);
@@ -268,7 +280,11 @@ function wsSetup() {
     socket.onmessage = function(msg) {  
         try {
             debug("WebSocket Recv:" + msg.data);
-            //XXX: TODO What are you going to do here?            
+            //XXX: TODO What are you going to do here?
+            drawNextFrame();
+            var message = JSON.parse(msg.data);
+            var key = Object.keys(message);
+            world[key] = message[key];
         } catch (e) {
             alert("socket on message: " + e);
         }
