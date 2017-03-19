@@ -24,7 +24,7 @@
   </head> 
   <body bgcolor="white" height="100%" width="100%"> 
     <div id="debug"></div>
-    <canvas id="c" width="100%" height="100%" style="-webkit-tap-highlight-color: transparent;"></canvas> 
+    <canvas id="c" width="100%" height="100%" style="background: url('./background.jpg')"></canvas> 
 
     <script>
       // Fix me
@@ -70,10 +70,17 @@ function prepEntity(entity) {
 }
 
 function clearFrame() {
+    var dark_image =  new Image();
+    dark_image.src = "http://hd-wall-papers.com/images/wallpapers/dark-background-images/dark-background-images-16.jpg";
+    var pattern =  context.createPattern(dark_image, "repeat")
     with(context) {
-	moveTo(0,0);
-	fillStyle = "#000";
-	fillRect(0,0,W,H);
+	    moveTo(0,0);
+	    fillStyle = "#000";
+	    fillRect(0,0,W,H);
+        context.clearRect(0,0,W,H);
+        context.rect(0,0,W,H);
+        context.fillStyle = pattern;
+        context.fill();
     }
 
 }
