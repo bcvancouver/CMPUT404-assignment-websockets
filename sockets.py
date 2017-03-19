@@ -77,6 +77,7 @@ myWorld = World()
 
 def set_listener( entity, data ):
     ''' do something with the update ! '''
+    myWorld.set(entity, data)
 
 myWorld.add_set_listener( set_listener )
 
@@ -84,19 +85,23 @@ myWorld.add_set_listener( set_listener )
 # Copied from https://github.com/abramhindle/WebSocketsExamples/blob/master/broadcaster.py#L111 written by Abram Hindle
 clients = list()
 
+
 # Copied from https://github.com/abramhindle/WebSocketsExamples/blob/master/broadcaster.py#L115 written by Abram Hindle
 def send_all(msg):
     for client in clients:
         client.put(msg)
 
+
 # Copied from https://github.com/abramhindle/WebSocketsExamples/blob/master/broadcaster.py#L119 written by Abram Hindle
 def send_all_json(obj):
     send_all(json.dumps(obj))
         
+
 @app.route('/')
 def hello():
     '''Return something coherent here.. perhaps redirect to /static/index.html '''
     return flask.redirect(flask.url_for('static', filename='index.html'))
+
 
 def read_ws(ws,client):
     '''A greenlet function that reads from the websocket and updates the world'''
@@ -104,6 +109,7 @@ def read_ws(ws,client):
     try:
         while True:
             data = ws.receive()
+            print data
             if len(data) != 0:
                 packet = json.loads(data)
                 myWorld.set(packet.keys()[0], packet.items()[0][1])
@@ -112,6 +118,7 @@ def read_ws(ws,client):
                 break
     except Exception as e:
         raise e
+
 
 @sockets.route('/subscribe')
 def subscribe_socket(ws):

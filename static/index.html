@@ -42,6 +42,32 @@ function debug(str) {
 }
 debug("Test");
 
+function sendJSONXMLHTTPRequest(url, objects, callback) {
+    var xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState===4) {
+            try {
+                if (xhr.status===200) {
+                    //XXX: parse some JSON from the request!
+                    //XXX: Pass the data to the callback!
+                    if (callback !== null) {
+                        callback(JSON.parse(xhr.responseText));
+                    }
+                }
+            } 
+            catch(e) {
+                alert('Error: ' + e.name);
+            }
+        }
+    };
+    //XXX: POST to a URL
+    xhr.open('POST', url);
+    //XXX: set the mimetype and the accept headers!
+    xhr.setRequestHeader("content-type", "application/json")
+    // Remember to use application/json !
+    xhr.send(JSON.stringify(objects));
+}
+
 world = {};
 
 //XXX: TODO Make this prettier!
