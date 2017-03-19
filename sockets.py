@@ -109,11 +109,11 @@ def read_ws(ws,client):
     try:
         while True:
             data = ws.receive()
-            print data
             if len(data) != 0:
                 packet = json.loads(data)
-                myWorld.set(packet.keys()[0], packet.items()[0][1])
+                myWorld.set(packet.get('entity'), packet.get('data'))
                 send_all_json(packet)
+                client.put(packet)
             else:
                 break
     except Exception as e:
@@ -128,6 +128,11 @@ def subscribe_socket(ws):
     client = Client()
     clients.append(client)
     g = gevent.spawn(read_ws, ws, client)
+    print "subscribing"
+
+    for key in myWorld.world().keys():
+        client.put(json.dumps({'entity': key, 'data': myWorld.world()[key]}))
+
     try:
         while True:
             message = client.get()
