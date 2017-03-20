@@ -36,3 +36,5 @@ nosetests.xml
 .pydevproject
 *~
 .idea
+marking/freetests.py.student
+marking/runtests.sh.student

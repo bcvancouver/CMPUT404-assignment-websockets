@@ -58,3 +58,13 @@ Contributors
 * Mark Galloway
 * Abram Hindle
 * Michael Xi
+
+Reference
+=========
+WebSocketsExamples for CMPUT404  
+https://github.com/abramhindle/WebSocketsExamples
+
+Resource
+========
+Background Image  
+http://hd-wall-papers.com/images/wallpapers/dark-background-images/dark-background-images-16.jpg

@@ -86,8 +86,8 @@ function drawCircle(context,entity) {
 }
 
 function prepEntity(entity) {
-    if (!entity["colour"]) {
-        entity["colour"] = "#FF0000";
+    if (!entity['colour']) {
+        entity['colour'] = "#FF0000";
     }
     if (!entity["radius"]) {
         entity["radius"] = 50;
@@ -98,7 +98,7 @@ function prepEntity(entity) {
 function clearFrame() {
     // Copied from previous ajax assignment
     var dark_image =  new Image();
-    dark_image.src = "http://hd-wall-papers.com/images/wallpapers/dark-background-images/dark-background-images-16.jpg";
+    dark_image.src = "./background.jpg";
     var pattern =  context.createPattern(dark_image, "repeat")
     with(context) {
 	    moveTo(0,0);
@@ -277,7 +277,7 @@ mouse.mouseuppers.push(function(x,y,clicked,e) {
 });
 
 mouse.mousedraggers.push(function(x,y,clicked,e) {
-    addEntityWithoutName({'x':x,'y':y,'colour':'green',
+    addEntityWithoutName({'x':x,'y':y,'colour':'white',
                           'radius':10});
 });
 
@@ -304,7 +304,7 @@ function wsSetup() {
     };
     socket.onmessage = function(msg) {
         try {
-            debug("WebSocket Recv:" + msg.data);
+            //debug("WebSocket Recv:" + msg.data);
             //XXX: TODO What are you going to do here?
             drawNextFrame();
             var message = JSON.parse(msg.data);
