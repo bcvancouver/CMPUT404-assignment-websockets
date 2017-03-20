@@ -77,13 +77,14 @@ myWorld = World()
 # Copied from https://github.com/abramhindle/WebSocketsExamples/blob/master/broadcaster.py#L111 written by Abram Hindle
 clients = list()
 
+
 def set_listener( entity, data ):
     ''' do something with the update ! '''
     updated = json.dumps({entity: data})
     for client in clients:
         client.put(updated)
 
-myWorld.add_set_listener( set_listener )
+myWorld.add_set_listener(set_listener)
 
 
 # Copied from https://github.com/abramhindle/WebSocketsExamples/blob/master/broadcaster.py#L115 written by Abram Hindle
@@ -109,11 +110,14 @@ def read_ws(ws, client):
     try:
         while True:
             data = ws.receive()
+            print "WS RECV: %s" % data
             if data is not None:
                 packet = json.loads(data)
-                myWorld.set(packet.get('entity'), packet.get('data'))
-                #send_all_json(packet)
+                #myWorld.set(packet.get('entity'), packet.get('data'))
+                send_all_json(packet)
                 #client.put(packet)
+                for entity in packet:
+                    myWorld.set(entity, packet[entity])
             else:
                 break
     except Exception as e:
@@ -128,12 +132,10 @@ def subscribe_socket(ws):
     print "subscribing"
     client = Client()
     clients.append(client)
-    event = gevent.spawn(read_ws, ws, client)
-
-    #for key in myWorld.world().keys():
-        #client.put(json.dumps({'entity': key, 'data': myWorld.world()[key]}))
+    g = gevent.spawn(read_ws, ws, client)
 
     try:
+        ws.send(json.dumps(myWorld.world()))
         while True:
             message = client.get()
             ws.send(message)
@@ -141,7 +143,7 @@ def subscribe_socket(ws):
         print "WS Error %s" % e
     finally:
         clients.remove(client)
-        gevent.kill(event)
+        gevent.kill(g)
 
 
 def flask_post_json():
